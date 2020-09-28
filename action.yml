@@ -1,0 +1,6 @@
+name: 'Setup Please action'
+description: 'Setup Please with the required environment settings'
+author: 'sagikazarmark'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
