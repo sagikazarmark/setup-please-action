@@ -951,7 +951,6 @@ function post() {
         }
     });
 }
-post();
 // Main
 if (!stateHelper.IsPost) {
     run();
