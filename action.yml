@@ -1,6 +1,20 @@
 name: 'Setup Please action'
 description: 'Setup Please with the required environment settings'
 author: 'sagikazarmark'
+inputs:
+  version:
+    description: 'Please version. Overrides the version in .plzconfig.'
+    default: ''
+    required: false
+  profile:
+    description: 'Configuration profile name'
+    default: ''
+    required: false
+  save-logs:
+    description: 'Save build logs as artifacts'
+    default: 'false'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
+  post: 'dist/index.js'
