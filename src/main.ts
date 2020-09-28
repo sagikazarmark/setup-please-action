@@ -1,6 +1,7 @@
 import * as artifact from '@actions/artifact'
-import * as glob from '@actions/glob'
 import * as core from '@actions/core'
+import {context} from '@actions/github'
+import * as glob from '@actions/glob'
 import * as stateHelper from './state-helper'
 
 async function run(): Promise<void> {
@@ -47,8 +48,7 @@ async function post(): Promise<void> {
       (core.getInput('save-logs') || 'false').toUpperCase() === 'TRUE'
 
     if (saveLogs) {
-      const job = (process.env['GITHUB_JOB'] as string) || ''
-      const artifactName = `${job}-log`
+      const artifactName = `${jobName()}-log`
 
       const artifactClient: artifact.ArtifactClient = artifact.create()
 
@@ -72,6 +72,21 @@ async function post(): Promise<void> {
   } catch (error) {
     core.setFailed(error.message)
   }
+}
+
+function jobName(): string {
+  if (
+    process.env.MATRIX_CONTEXT == null ||
+    process.env.MATRIX_CONTEXT === 'null'
+  ) {
+    return context.job
+  }
+
+  const matrix = JSON.parse(process.env.MATRIX_CONTEXT)
+
+  const value = Object.values(matrix).join('-')
+
+  return value !== '' ? `${context.job}-${value}` : context.job
 }
 
 // Main
