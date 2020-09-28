@@ -74,8 +74,6 @@ async function post(): Promise<void> {
   }
 }
 
-post()
-
 // Main
 if (!stateHelper.IsPost) {
   run()
