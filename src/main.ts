@@ -75,7 +75,7 @@ async function post(): Promise<void> {
 }
 
 function jobName(): string {
-  // See https://github.com/8398a7/action-slack/issues/108#issuecomment-690093896
+  // See https://github.com/sagikazarmark/setup-please-action/issues/6
   if (
     process.env.MATRIX_CONTEXT == null ||
     process.env.MATRIX_CONTEXT === 'null'
