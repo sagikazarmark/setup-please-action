@@ -2,6 +2,7 @@ import * as artifact from '@actions/artifact'
 import * as core from '@actions/core'
 import {context} from '@actions/github'
 import * as glob from '@actions/glob'
+import {Config, loadConfig} from './config'
 import * as stateHelper from './state-helper'
 
 async function run(): Promise<void> {
@@ -15,7 +16,16 @@ async function run(): Promise<void> {
       core.warning('PATH is empty')
     }
 
-    const version = core.getInput('version')
+    const profile = core.getInput('profile')
+    if (profile) {
+      core.info(`Using profile ${profile}`)
+
+      core.exportVariable('PLZ_CONFIG_PROFILE', profile)
+    }
+
+    const config: Config = await loadConfig(profile)
+
+    let version = core.getInput('version')
     if (version) {
       core.info(`Overriding Please version, using ${version}`)
 
@@ -25,17 +35,8 @@ async function run(): Promise<void> {
     // Override the build path using the current PATH
     core.exportVariable('PLZ_OVERRIDES', overrides)
 
-    const profile = core.getInput('profile')
-    if (profile) {
-      core.info(`Using profile ${profile}`)
-
-      core.exportVariable('PLZ_CONFIG_PROFILE', profile)
-    }
-
     // Set Please arguments
     core.exportVariable('PLZ_ARGS', '-p')
-
-    // TODO: download please upfront
   } catch (error) {
     core.setFailed(error.message)
   }
