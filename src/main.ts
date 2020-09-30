@@ -4,10 +4,13 @@ import {context} from '@actions/github'
 import * as glob from '@actions/glob'
 import {Config, loadConfig} from './config'
 import {download} from './download'
+import {Inputs, getInputs} from './inputs'
 import * as stateHelper from './state-helper'
 
 async function run(): Promise<void> {
   try {
+    const inputs: Inputs = getInputs()
+
     let overrides = ''
 
     const path = (process.env['PATH'] as string) || ''
@@ -17,22 +20,20 @@ async function run(): Promise<void> {
       core.warning('PATH is empty')
     }
 
-    const profile = core.getInput('profile')
-    if (profile) {
-      core.info(`Using profile ${profile}`)
+    if (inputs.profile) {
+      core.info(`Using profile ${inputs.profile}`)
 
-      core.exportVariable('PLZ_CONFIG_PROFILE', profile)
+      core.exportVariable('PLZ_CONFIG_PROFILE', inputs.profile)
     }
 
-    const config: Config = await loadConfig(profile)
+    const config: Config = await loadConfig(inputs.profile)
 
-    const version = core.getInput('version')
-    if (version) {
-      core.info(`Overriding Please version, using ${version}`)
+    if (inputs.version) {
+      core.info(`Overriding Please version, using ${inputs.version}`)
 
-      overrides += `,please.version:${version}`
+      overrides += `,please.version:${inputs.version}`
 
-      config.version = version
+      config.version = inputs.version
     }
 
     // Override the build path using the current PATH
@@ -50,10 +51,9 @@ async function run(): Promise<void> {
 
 async function post(): Promise<void> {
   try {
-    // saveLogs will be false unless true is the exact input
-    const saveLogs: boolean = /true/i.test(core.getInput('save-logs'))
+    const inputs: Inputs = getInputs()
 
-    if (saveLogs) {
+    if (inputs.saveLogs) {
       const artifactName = `${jobName()}-log`
 
       const artifactClient: artifact.ArtifactClient = artifact.create()
