@@ -53,7 +53,7 @@ async function downloadPlz(version: string): Promise<void> {
   const plzTool = await tc.downloadTool(downloadUrl, '/usr/local/bin/plz')
   await fs.chmod(plzTool, 0o755)
 
-  const cachedPath = await tc.cacheDir(plzTool, 'please', version)
+  const cachedPath = await tc.cacheFile(plzTool, 'plz', 'plz', version)
 
   core.addPath(cachedPath)
 }
