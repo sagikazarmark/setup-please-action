@@ -2,6 +2,8 @@ import * as artifact from '@actions/artifact'
 import * as core from '@actions/core'
 import {context} from '@actions/github'
 import * as glob from '@actions/glob'
+import {Config, loadConfig} from './config'
+import {download} from './download'
 import * as stateHelper from './state-helper'
 
 async function run(): Promise<void> {
@@ -15,16 +17,6 @@ async function run(): Promise<void> {
       core.warning('PATH is empty')
     }
 
-    const version = core.getInput('version')
-    if (version) {
-      core.info(`Overriding Please version, using ${version}`)
-
-      overrides += `,please.version:${version}`
-    }
-
-    // Override the build path using the current PATH
-    core.exportVariable('PLZ_OVERRIDES', overrides)
-
     const profile = core.getInput('profile')
     if (profile) {
       core.info(`Using profile ${profile}`)
@@ -32,10 +24,25 @@ async function run(): Promise<void> {
       core.exportVariable('PLZ_CONFIG_PROFILE', profile)
     }
 
+    const config: Config = await loadConfig(profile)
+
+    const version = core.getInput('version')
+    if (version) {
+      core.info(`Overriding Please version, using ${version}`)
+
+      overrides += `,please.version:${version}`
+
+      config.version = version
+    }
+
+    // Override the build path using the current PATH
+    core.exportVariable('PLZ_OVERRIDES', overrides)
+
     // Set Please arguments
     core.exportVariable('PLZ_ARGS', '-p')
 
-    // TODO: download please upfront
+    // Download Please
+    await download(config)
   } catch (error) {
     core.setFailed(error.message)
   }
@@ -44,8 +51,7 @@ async function run(): Promise<void> {
 async function post(): Promise<void> {
   try {
     // saveLogs will be false unless true is the exact input
-    const saveLogs: boolean =
-      (core.getInput('save-logs') || 'false').toUpperCase() === 'TRUE'
+    const saveLogs: boolean = /true/i.test(core.getInput('save-logs'))
 
     if (saveLogs) {
       const artifactName = `${jobName()}-log`
