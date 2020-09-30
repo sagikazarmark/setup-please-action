@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as httpm from '@actions/http-client'
 import * as tc from '@actions/tool-cache'
 import {promises as fs} from 'fs'
 import os from 'os'
@@ -9,7 +10,11 @@ export async function download(config: Config): Promise<void> {
   let version: string = config.version
 
   if (version === 'latest') {
+    core.info('finding latest version')
+
     version = await findLatestVersion(config.downloadlocation)
+
+    core.info(`latest version is '${version}'`)
   }
 
   const baseUrl: string = config.downloadlocation
@@ -37,9 +42,25 @@ export async function download(config: Config): Promise<void> {
 }
 
 async function findLatestVersion(downloadLocation: string): Promise<string> {
-  // TODO: find latest version
-  downloadLocation = ''
-  return downloadLocation
+  const http = new httpm.HttpClient(`please/setup-please-action`, [], {
+    allowRetries: true,
+    maxRetries: 5
+  })
+
+  try {
+    const response: httpm.HttpClientResponse = await http.get(
+      `${downloadLocation}/latest_version`
+    )
+    if (response.message.statusCode !== 200) {
+      throw new Error(
+        `failed to get latest version. Code(${response.message.statusCode}) Message(${response.message.statusMessage})`
+      )
+    }
+
+    return response.readBody()
+  } catch (error) {
+    throw new Error(`failed to get latest version: ${error.message}`)
+  }
 }
 
 function platform(): string {
