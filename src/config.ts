@@ -1,7 +1,7 @@
 import path from 'path'
-import os from 'os'
 import {getWorkspaceDirectory} from './context'
 import {readFiles} from './fs-helper'
+import * as system from './system'
 
 export type Config = Record<string, string>
 
@@ -18,12 +18,11 @@ export async function loadConfig(profile: string): Promise<Config> {
 }
 
 async function readConfigFiles(profile: string): Promise<string[]> {
-  const platform = os.platform().toString()
   const workspace = getWorkspaceDirectory()
 
   const configFiles = [
     path.join(workspace, '.plzconfig'),
-    path.join(workspace, `.plzconfig.${platform}`)
+    path.join(workspace, `.plzconfig.${system.getPlatform()}`)
   ]
 
   if (profile) {

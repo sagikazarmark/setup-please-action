@@ -2,9 +2,9 @@ import * as core from '@actions/core'
 import * as httpm from '@actions/http-client'
 import * as tc from '@actions/tool-cache'
 import {promises as fs} from 'fs'
-import os from 'os'
 import path from 'path'
 import {Config} from './config'
+import * as system from './system'
 
 export async function download(config: Config): Promise<void> {
   await downloadPlease(config)
@@ -23,7 +23,9 @@ async function downloadPlease(config: Config): Promise<void> {
   }
 
   const baseUrl: string = config.downloadlocation
-  const downloadUrl = `${baseUrl}/${platform()}_${arch()}/${version}/please_${version}.tar.xz`
+  const platform: string = system.getPlatform()
+  const arch: string = system.getArch()
+  const downloadUrl = `${baseUrl}/${platform}_${arch}/${version}/please_${version}.tar.xz`
 
   const pleaseArchive = await tc.downloadTool(downloadUrl)
 
@@ -77,22 +79,5 @@ async function findLatestVersion(downloadLocation: string): Promise<string> {
     return response.readBody()
   } catch (error) {
     throw new Error(`failed to get latest version: ${error.message}`)
-  }
-}
-
-function platform(): string {
-  return os.platform().toString()
-}
-
-function arch(): string {
-  switch (os.arch()) {
-    case 'x32':
-      return '386'
-
-    case 'x64':
-      return 'amd64'
-
-    default:
-      throw Error('unsupported arch')
   }
 }
