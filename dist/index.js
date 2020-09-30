@@ -2171,6 +2171,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseConfigs = exports.parseConfig = exports.loadConfig = void 0;
 const path_1 = __importDefault(__webpack_require__(622));
 const os_1 = __importDefault(__webpack_require__(87));
+const context_1 = __webpack_require__(842);
 const fs_helper_1 = __webpack_require__(247);
 const defaultConfig = {
     version: 'latest',
@@ -2187,7 +2188,7 @@ exports.loadConfig = loadConfig;
 function readConfigFiles(profile) {
     return __awaiter(this, void 0, void 0, function* () {
         const platform = os_1.default.platform().toString();
-        const workspace = process.env['GITHUB_WORKSPACE'];
+        const workspace = context_1.getWorkspaceDirectory();
         const configFiles = [
             path_1.default.join(workspace, '.plzconfig'),
             path_1.default.join(workspace, `.plzconfig.${platform}`)
@@ -2311,39 +2312,47 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const artifact = __importStar(__webpack_require__(605));
 const core = __importStar(__webpack_require__(186));
 const github_1 = __webpack_require__(438);
 const glob = __importStar(__webpack_require__(90));
+const fs_1 = __webpack_require__(747);
+const path_1 = __importDefault(__webpack_require__(622));
 const config_1 = __webpack_require__(88);
+const context_1 = __webpack_require__(842);
 const download_1 = __webpack_require__(933);
+const inputs_1 = __webpack_require__(180);
 const stateHelper = __importStar(__webpack_require__(647));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let overrides = '';
-            const path = process.env['PATH'] || '';
-            if (path) {
-                overrides += `build.path:${path}`;
+            const inputs = inputs_1.getInputs();
+            const overrides = [];
+            const buildPath = process.env['PATH'] || '';
+            if (buildPath) {
+                overrides.push(`build.path:${buildPath}`);
             }
             else {
                 core.warning('PATH is empty');
             }
-            const profile = core.getInput('profile');
-            if (profile) {
-                core.info(`Using profile ${profile}`);
-                core.exportVariable('PLZ_CONFIG_PROFILE', profile);
+            if (inputs.profile) {
+                core.info(`Using profile ${inputs.profile}`);
+                core.exportVariable('PLZ_CONFIG_PROFILE', inputs.profile);
             }
-            const config = yield config_1.loadConfig(profile);
-            const version = core.getInput('version');
-            if (version) {
-                core.info(`Overriding Please version, using ${version}`);
-                overrides += `,please.version:${version}`;
-                config.version = version;
+            const config = yield config_1.loadConfig(inputs.profile);
+            if (inputs.version) {
+                core.info(`Overriding Please version, using ${inputs.version}`);
+                overrides.push(`please.version:${inputs.version}`);
+                config.version = inputs.version;
             }
             // Override the build path using the current PATH
-            core.exportVariable('PLZ_OVERRIDES', overrides);
+            if (overrides.length > 0) {
+                core.exportVariable('PLZ_OVERRIDES', overrides.join(','));
+            }
             // Set Please arguments
             core.exportVariable('PLZ_ARGS', '-p');
             // Download Please
@@ -2357,12 +2366,18 @@ function run() {
 function post() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // saveLogs will be false unless true is the exact input
-            const saveLogs = /true/i.test(core.getInput('save-logs'));
-            if (saveLogs) {
+            const inputs = inputs_1.getInputs();
+            if (inputs.saveLogs) {
                 const artifactName = `${jobName()}-log`;
                 const artifactClient = artifact.create();
-                const rootDirectory = 'plz-out/log';
+                const rootDirectory = path_1.default.join(context_1.getWorkspaceDirectory(), 'plz-out/log');
+                try {
+                    yield fs_1.promises.access(rootDirectory);
+                }
+                catch (error) {
+                    core.warning('Please log directory not found');
+                    return;
+                }
                 const options = {
                     continueOnError: true
                 };
@@ -3044,6 +3059,45 @@ class ExecState extends events.EventEmitter {
     }
 }
 //# sourceMappingURL=toolrunner.js.map
+
+/***/ }),
+
+/***/ 180:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getInputs = void 0;
+const core = __importStar(__webpack_require__(186));
+function getInputs() {
+    return {
+        version: core.getInput('version'),
+        profile: core.getInput('profile'),
+        saveLogs: /true/i.test(core.getInput('save-logs'))
+    };
+}
+exports.getInputs = getInputs;
+
 
 /***/ }),
 
@@ -12032,6 +12086,25 @@ exports.Path = Path;
 
 /***/ }),
 
+/***/ 842:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getWorkspaceDirectory = void 0;
+function getWorkspaceDirectory() {
+    const workspaceDirectory = process.env['GITHUB_WORKSPACE'];
+    if (!workspaceDirectory) {
+        throw new Error('Unable to get GITHUB_WORKSPACE env variable');
+    }
+    return workspaceDirectory;
+}
+exports.getWorkspaceDirectory = getWorkspaceDirectory;
+
+
+/***/ }),
+
 /***/ 849:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -14596,15 +14669,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.download = void 0;
 const core = __importStar(__webpack_require__(186));
+const httpm = __importStar(__webpack_require__(925));
 const tc = __importStar(__webpack_require__(784));
 const fs_1 = __webpack_require__(747);
 const os_1 = __importDefault(__webpack_require__(87));
 const path_1 = __importDefault(__webpack_require__(622));
 function download(config) {
     return __awaiter(this, void 0, void 0, function* () {
+        yield downloadPlease(config);
+        yield downloadPlz(config.version);
+    });
+}
+exports.download = download;
+function downloadPlease(config) {
+    return __awaiter(this, void 0, void 0, function* () {
         let version = config.version;
         if (version === 'latest') {
+            core.info('finding latest version');
             version = yield findLatestVersion(config.downloadlocation);
+            core.info(`latest version is '${version}'`);
         }
         const baseUrl = config.downloadlocation;
         const downloadUrl = `${baseUrl}/${platform()}_${arch()}/${version}/please_${version}.tar.xz`;
@@ -14622,12 +14705,31 @@ function download(config) {
         }
     });
 }
-exports.download = download;
+function downloadPlz(version) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const downloadUrl = 'https://raw.githubusercontent.com/thought-machine/please/306dc7cfcbab8d9472c9a349deaaab1b658b51b8/pleasew';
+        const plzTool = yield tc.downloadTool(downloadUrl, '/usr/local/bin/plz');
+        yield fs_1.promises.chmod(plzTool, 0o755);
+        const cachedPath = yield tc.cacheDir(plzTool, 'please', version);
+        core.addPath(cachedPath);
+    });
+}
 function findLatestVersion(downloadLocation) {
     return __awaiter(this, void 0, void 0, function* () {
-        // TODO: find latest version
-        downloadLocation = '';
-        return downloadLocation;
+        const http = new httpm.HttpClient(`please/setup-please-action`, [], {
+            allowRetries: true,
+            maxRetries: 5
+        });
+        try {
+            const response = yield http.get(`${downloadLocation}/latest_version`);
+            if (response.message.statusCode !== 200) {
+                throw new Error(`failed to get latest version. Code(${response.message.statusCode}) Message(${response.message.statusMessage})`);
+            }
+            return response.readBody();
+        }
+        catch (error) {
+            throw new Error(`failed to get latest version: ${error.message}`);
+        }
     });
 }
 function platform() {
