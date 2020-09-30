@@ -59,7 +59,11 @@ async function post(): Promise<void> {
     const inputs: Inputs = getInputs()
 
     if (inputs.saveLogs) {
-      const artifactName = `${jobName()}-log`
+      const job = jobName()
+
+      core.info(`Saving logs for job '${job}'`)
+
+      const artifactName = `${job}-log`
 
       const artifactClient: artifact.ArtifactClient = artifact.create()
 
