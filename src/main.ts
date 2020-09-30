@@ -11,11 +11,11 @@ async function run(): Promise<void> {
   try {
     const inputs: Inputs = getInputs()
 
-    let overrides = ''
+    const overrides: string[] = []
 
     const path = (process.env['PATH'] as string) || ''
     if (path) {
-      overrides += `build.path:${path}`
+      overrides.push(`build.path:${path}`)
     } else {
       core.warning('PATH is empty')
     }
@@ -31,13 +31,15 @@ async function run(): Promise<void> {
     if (inputs.version) {
       core.info(`Overriding Please version, using ${inputs.version}`)
 
-      overrides += `,please.version:${inputs.version}`
+      overrides.push(`please.version:${inputs.version}`)
 
       config.version = inputs.version
     }
 
     // Override the build path using the current PATH
-    core.exportVariable('PLZ_OVERRIDES', overrides)
+    if (overrides.length > 0) {
+      core.exportVariable('PLZ_OVERRIDES', overrides.join(','))
+    }
 
     // Set Please arguments
     core.exportVariable('PLZ_ARGS', '-p')
