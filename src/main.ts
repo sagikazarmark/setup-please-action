@@ -45,8 +45,7 @@ async function run(): Promise<void> {
 async function post(): Promise<void> {
   try {
     // saveLogs will be false unless true is the exact input
-    const saveLogs: boolean =
-      (core.getInput('save-logs') || 'false').toUpperCase() === 'TRUE'
+    const saveLogs: boolean = /true/i.test(core.getInput('save-logs'))
 
     if (saveLogs) {
       const artifactName = `${jobName()}-log`
