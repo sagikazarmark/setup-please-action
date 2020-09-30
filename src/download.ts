@@ -18,7 +18,7 @@ export async function download(config: Config): Promise<void> {
   const pleaseExtractedFolder = await tc.extractTar(
     pleaseArchive,
     path.join(config.location, version),
-    'xJ'
+    ['xJ', '--strip-components=1']
   )
 
   const cachedPath = await tc.cacheDir(pleaseExtractedFolder, 'please', version)

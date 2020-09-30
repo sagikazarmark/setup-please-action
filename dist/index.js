@@ -14608,7 +14608,7 @@ function download(config) {
         const baseUrl = config.downloadlocation;
         const downloadUrl = `${baseUrl}/${platform()}_${arch()}/${version}/please_${version}.tar.xz`;
         const pleaseArchive = yield tc.downloadTool(downloadUrl);
-        const pleaseExtractedFolder = yield tc.extractTar(pleaseArchive, path_1.default.join(config.location, version), 'xJ');
+        const pleaseExtractedFolder = yield tc.extractTar(pleaseArchive, path_1.default.join(config.location, version), ['xJ', '--strip-components=1']);
         const cachedPath = yield tc.cacheDir(pleaseExtractedFolder, 'please', version);
         core.addPath(cachedPath);
     });
