@@ -2386,7 +2386,9 @@ function post() {
         try {
             const inputs = inputs_1.getInputs();
             if (inputs.saveLogs) {
-                const artifactName = `${jobName()}-log`;
+                const job = jobName();
+                core.info(`Saving logs for job '${job}'`);
+                const artifactName = `${job}-log`;
                 const artifactClient = artifact.create();
                 const rootDirectory = path_1.default.join(context_1.getWorkspaceDirectory(), 'plz-out/log');
                 try {
