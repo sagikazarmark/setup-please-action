@@ -7,6 +7,11 @@ import path from 'path'
 import {Config} from './config'
 
 export async function download(config: Config): Promise<void> {
+  await downloadPlease(config)
+  await downloadPlz(config.version)
+}
+
+async function downloadPlease(config: Config): Promise<void> {
   let version: string = config.version
 
   if (version === 'latest') {
@@ -39,6 +44,18 @@ export async function download(config: Config): Promise<void> {
       path.join(config.location, file)
     )
   }
+}
+
+async function downloadPlz(version: string): Promise<void> {
+  const downloadUrl =
+    'https://raw.githubusercontent.com/thought-machine/please/306dc7cfcbab8d9472c9a349deaaab1b658b51b8/pleasew'
+
+  const plzTool = await tc.downloadTool(downloadUrl, '/usr/local/bin/plz')
+  await fs.chmod(plzTool, 0o755)
+
+  const cachedPath = await tc.cacheDir(plzTool, 'please', version)
+
+  core.addPath(cachedPath)
 }
 
 async function findLatestVersion(downloadLocation: string): Promise<string> {
