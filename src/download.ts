@@ -15,12 +15,26 @@ async function downloadPlease(config: Config): Promise<void> {
   let version: string = config.version
 
   if (version === 'latest') {
-    core.info('finding latest version')
+    core.info('Finding latest version')
 
     version = await findLatestVersion(config.downloadlocation)
 
-    core.info(`latest version is '${version}'`)
+    core.info(`Latest version is '${version}'`)
   }
+
+  let toolPath: string
+  toolPath = tc.find('please', version)
+
+  // If not found in cache, download
+  if (toolPath) {
+    core.info(`Found Please in cache @ ${toolPath}`)
+
+    core.addPath(toolPath)
+
+    return
+  }
+
+  core.info(`Attempting to download Please ${version}...`)
 
   const baseUrl: string = config.downloadlocation
   const platform: string = system.getPlatform()
@@ -29,7 +43,7 @@ async function downloadPlease(config: Config): Promise<void> {
 
   const pleaseArchive = await tc.downloadTool(downloadUrl)
 
-  const toolPath = path.join(config.location, version)
+  toolPath = path.join(config.location, version)
   const pleaseExtractedFolder = await tc.extractTar(pleaseArchive, toolPath, [
     'xJ',
     '--strip-components=1'
@@ -49,6 +63,19 @@ async function downloadPlease(config: Config): Promise<void> {
 }
 
 async function downloadPlz(version: string): Promise<void> {
+  const toolPath = tc.find('plz', version)
+
+  // If not found in cache, download
+  if (toolPath) {
+    core.info(`Found plz in cache @ ${toolPath}`)
+
+    core.addPath(toolPath)
+
+    return
+  }
+
+  core.info(`Attempting to download plz ${version}...`)
+
   const downloadUrl =
     'https://raw.githubusercontent.com/thought-machine/please/306dc7cfcbab8d9472c9a349deaaab1b658b51b8/pleasew'
 
