@@ -3,6 +3,7 @@ import * as core from '@actions/core'
 import {context} from '@actions/github'
 import * as glob from '@actions/glob'
 import {Config, loadConfig} from './config'
+import {download} from './download'
 import * as stateHelper from './state-helper'
 
 async function run(): Promise<void> {
@@ -37,6 +38,9 @@ async function run(): Promise<void> {
 
     // Set Please arguments
     core.exportVariable('PLZ_ARGS', '-p')
+
+    // Download Please
+    download(config)
   } catch (error) {
     core.setFailed(error.message)
   }
