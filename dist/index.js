@@ -14710,7 +14710,7 @@ function downloadPlz(version) {
         const downloadUrl = 'https://raw.githubusercontent.com/thought-machine/please/306dc7cfcbab8d9472c9a349deaaab1b658b51b8/pleasew';
         const plzTool = yield tc.downloadTool(downloadUrl, '/usr/local/bin/plz');
         yield fs_1.promises.chmod(plzTool, 0o755);
-        const cachedPath = yield tc.cacheDir(plzTool, 'please', version);
+        const cachedPath = yield tc.cacheFile(plzTool, 'plz', 'plz', version);
         core.addPath(cachedPath);
     });
 }
