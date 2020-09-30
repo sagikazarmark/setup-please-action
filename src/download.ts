@@ -15,9 +15,10 @@ export async function download(config: Config): Promise<void> {
   const downloadUrl = `${baseUrl}/${platform()}_${arch()}/${version}/please_${version}.tar.xz`
 
   const pleaseArchive = await tc.downloadTool(downloadUrl)
-  const pleaseExtractedFolder = await tc.extractZip(
+  const pleaseExtractedFolder = await tc.extractTar(
     pleaseArchive,
-    path.join(config.location, version)
+    path.join(config.location, version),
+    'xJ'
   )
 
   const cachedPath = await tc.cacheDir(pleaseExtractedFolder, 'please', version)
