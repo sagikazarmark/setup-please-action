@@ -2155,6 +2155,25 @@ module.exports = require("os");
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -2170,9 +2189,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseConfigs = exports.parseConfig = exports.loadConfig = void 0;
 const path_1 = __importDefault(__webpack_require__(622));
-const os_1 = __importDefault(__webpack_require__(87));
 const context_1 = __webpack_require__(842);
 const fs_helper_1 = __webpack_require__(247);
+const system = __importStar(__webpack_require__(785));
 const defaultConfig = {
     version: 'latest',
     location: path_1.default.join(process.env['HOME'], '.please'),
@@ -2187,11 +2206,10 @@ function loadConfig(profile) {
 exports.loadConfig = loadConfig;
 function readConfigFiles(profile) {
     return __awaiter(this, void 0, void 0, function* () {
-        const platform = os_1.default.platform().toString();
         const workspace = context_1.getWorkspaceDirectory();
         const configFiles = [
             path_1.default.join(workspace, '.plzconfig'),
-            path_1.default.join(workspace, `.plzconfig.${platform}`)
+            path_1.default.join(workspace, `.plzconfig.${system.getPlatform()}`)
         ];
         if (profile) {
             configFiles.push(path_1.default.join(workspace, `.plzconfig.${profile}`));
@@ -11766,6 +11784,52 @@ function _unique(values) {
 
 /***/ }),
 
+/***/ 785:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getArch = exports.getPlatform = void 0;
+const os_1 = __importDefault(__webpack_require__(87));
+// Based on https://github.com/actions/setup-go/blob/7ff6287c800e9b340178c6e85d648e9328975ab0/src/system.ts
+function getPlatform() {
+    // darwin, linux and freebsd match already
+    // 'aix', 'darwin', 'freebsd', 'linux', 'openbsd', 'sunos', and 'win32'
+    let platform = os_1.default.platform();
+    // wants 'darwin', 'freebsd', 'linux', 'windows'
+    if (platform === 'win32') {
+        platform = 'windows';
+    }
+    return platform;
+}
+exports.getPlatform = getPlatform;
+function getArch() {
+    // 'arm', 'arm64', 'ia32', 'mips', 'mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32', and 'x64'.
+    let arch = os_1.default.arch();
+    // wants amd64, 386, arm64, armv61, ppc641e, s390x
+    // only amd64 is supported
+    switch (arch) {
+        case 'x64':
+            arch = 'amd64';
+            break;
+        // case 'ppc':
+        //   arch = 'ppc64'
+        //   break
+        case 'x32':
+            arch = '386';
+            break;
+    }
+    return arch;
+}
+exports.getArch = getArch;
+
+
+/***/ }),
+
 /***/ 802:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -14672,8 +14736,8 @@ const core = __importStar(__webpack_require__(186));
 const httpm = __importStar(__webpack_require__(925));
 const tc = __importStar(__webpack_require__(784));
 const fs_1 = __webpack_require__(747);
-const os_1 = __importDefault(__webpack_require__(87));
 const path_1 = __importDefault(__webpack_require__(622));
+const system = __importStar(__webpack_require__(785));
 function download(config) {
     return __awaiter(this, void 0, void 0, function* () {
         yield downloadPlease(config);
@@ -14685,14 +14749,25 @@ function downloadPlease(config) {
     return __awaiter(this, void 0, void 0, function* () {
         let version = config.version;
         if (version === 'latest') {
-            core.info('finding latest version');
+            core.info('Finding latest version');
             version = yield findLatestVersion(config.downloadlocation);
-            core.info(`latest version is '${version}'`);
+            core.info(`Latest version is '${version}'`);
         }
+        let toolPath;
+        toolPath = tc.find('please', version);
+        // If not found in cache, download
+        if (toolPath) {
+            core.info(`Found Please in cache @ ${toolPath}`);
+            core.addPath(toolPath);
+            return;
+        }
+        core.info(`Attempting to download Please ${version}...`);
         const baseUrl = config.downloadlocation;
-        const downloadUrl = `${baseUrl}/${platform()}_${arch()}/${version}/please_${version}.tar.xz`;
+        const platform = system.getPlatform();
+        const arch = system.getArch();
+        const downloadUrl = `${baseUrl}/${platform}_${arch}/${version}/please_${version}.tar.xz`;
         const pleaseArchive = yield tc.downloadTool(downloadUrl);
-        const toolPath = path_1.default.join(config.location, version);
+        toolPath = path_1.default.join(config.location, version);
         const pleaseExtractedFolder = yield tc.extractTar(pleaseArchive, toolPath, [
             'xJ',
             '--strip-components=1'
@@ -14707,6 +14782,14 @@ function downloadPlease(config) {
 }
 function downloadPlz(version) {
     return __awaiter(this, void 0, void 0, function* () {
+        const toolPath = tc.find('plz', version);
+        // If not found in cache, download
+        if (toolPath) {
+            core.info(`Found plz in cache @ ${toolPath}`);
+            core.addPath(toolPath);
+            return;
+        }
+        core.info(`Attempting to download plz ${version}...`);
         const downloadUrl = 'https://raw.githubusercontent.com/thought-machine/please/306dc7cfcbab8d9472c9a349deaaab1b658b51b8/pleasew';
         const plzTool = yield tc.downloadTool(downloadUrl);
         yield fs_1.promises.chmod(plzTool, 0o755);
@@ -14731,19 +14814,6 @@ function findLatestVersion(downloadLocation) {
             throw new Error(`failed to get latest version: ${error.message}`);
         }
     });
-}
-function platform() {
-    return os_1.default.platform().toString();
-}
-function arch() {
-    switch (os_1.default.arch()) {
-        case 'x32':
-            return '386';
-        case 'x64':
-            return 'amd64';
-        default:
-            throw Error('unsupported arch');
-    }
 }
 
 
