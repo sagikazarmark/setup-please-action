@@ -2,7 +2,10 @@ import * as artifact from '@actions/artifact'
 import * as core from '@actions/core'
 import {context} from '@actions/github'
 import * as glob from '@actions/glob'
+import {promises as fs} from 'fs'
+import path from 'path'
 import {Config, loadConfig} from './config'
+import {getWorkspaceDirectory} from './context'
 import {download} from './download'
 import {Inputs, getInputs} from './inputs'
 import * as stateHelper from './state-helper'
@@ -60,7 +63,16 @@ async function post(): Promise<void> {
 
       const artifactClient: artifact.ArtifactClient = artifact.create()
 
-      const rootDirectory = 'plz-out/log'
+      const rootDirectory = path.join(getWorkspaceDirectory(), 'plz-out/log')
+
+      try {
+        await fs.access(rootDirectory)
+      } catch (error) {
+        core.warning('Please log directory not found')
+
+        return
+      }
+
       const options: artifact.UploadOptions = {
         continueOnError: true
       }
