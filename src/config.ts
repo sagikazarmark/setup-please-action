@@ -1,5 +1,6 @@
 import path from 'path'
 import os from 'os'
+import {getWorkspaceDirectory} from './context'
 import {readFiles} from './fs-helper'
 
 export type Config = Record<string, string>
@@ -18,7 +19,7 @@ export async function loadConfig(profile: string): Promise<Config> {
 
 async function readConfigFiles(profile: string): Promise<string[]> {
   const platform = os.platform().toString()
-  const workspace = process.env['GITHUB_WORKSPACE'] as string
+  const workspace = getWorkspaceDirectory()
 
   const configFiles = [
     path.join(workspace, '.plzconfig'),
