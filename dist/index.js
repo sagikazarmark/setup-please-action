@@ -14597,6 +14597,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.download = void 0;
 const core = __importStar(__webpack_require__(186));
 const tc = __importStar(__webpack_require__(784));
+const fs_1 = __webpack_require__(747);
 const os_1 = __importDefault(__webpack_require__(87));
 const path_1 = __importDefault(__webpack_require__(622));
 function download(config) {
@@ -14608,9 +14609,17 @@ function download(config) {
         const baseUrl = config.downloadlocation;
         const downloadUrl = `${baseUrl}/${platform()}_${arch()}/${version}/please_${version}.tar.xz`;
         const pleaseArchive = yield tc.downloadTool(downloadUrl);
-        const pleaseExtractedFolder = yield tc.extractTar(pleaseArchive, path_1.default.join(config.location, version), ['xJ', '--strip-components=1']);
+        const toolPath = path_1.default.join(config.location, version);
+        const pleaseExtractedFolder = yield tc.extractTar(pleaseArchive, toolPath, [
+            'xJ',
+            '--strip-components=1'
+        ]);
         const cachedPath = yield tc.cacheDir(pleaseExtractedFolder, 'please', version);
         core.addPath(cachedPath);
+        const pleaseFiles = yield fs_1.promises.readdir(cachedPath);
+        for (const file of pleaseFiles) {
+            yield fs_1.promises.symlink(path_1.default.join(toolPath, file), path_1.default.join(config.location, file));
+        }
     });
 }
 exports.download = download;

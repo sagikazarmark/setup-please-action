@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
+import {promises as fs} from 'fs'
 import os from 'os'
 import path from 'path'
 import {Config} from './config'
@@ -15,14 +16,24 @@ export async function download(config: Config): Promise<void> {
   const downloadUrl = `${baseUrl}/${platform()}_${arch()}/${version}/please_${version}.tar.xz`
 
   const pleaseArchive = await tc.downloadTool(downloadUrl)
-  const pleaseExtractedFolder = await tc.extractTar(
-    pleaseArchive,
-    path.join(config.location, version),
-    ['xJ', '--strip-components=1']
-  )
+
+  const toolPath = path.join(config.location, version)
+  const pleaseExtractedFolder = await tc.extractTar(pleaseArchive, toolPath, [
+    'xJ',
+    '--strip-components=1'
+  ])
 
   const cachedPath = await tc.cacheDir(pleaseExtractedFolder, 'please', version)
   core.addPath(cachedPath)
+
+  const pleaseFiles: string[] = await fs.readdir(cachedPath)
+
+  for (const file of pleaseFiles) {
+    await fs.symlink(
+      path.join(toolPath, file),
+      path.join(config.location, file)
+    )
+  }
 }
 
 async function findLatestVersion(downloadLocation: string): Promise<string> {
