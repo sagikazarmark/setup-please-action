@@ -26,11 +26,13 @@ async function run(): Promise<void> {
 
     const config: Config = await loadConfig(profile)
 
-    let version = core.getInput('version')
+    const version = core.getInput('version')
     if (version) {
       core.info(`Overriding Please version, using ${version}`)
 
       overrides += `,please.version:${version}`
+
+      config.version = version
     }
 
     // Override the build path using the current PATH

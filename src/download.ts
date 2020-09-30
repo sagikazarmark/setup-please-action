@@ -1,12 +1,13 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import os from 'os'
+import path from 'path'
 import {Config} from './config'
 
 export async function download(config: Config): Promise<void> {
   let version: string = config.version
 
-  if (version == 'latest') {
+  if (version === 'latest') {
     version = await findLatestVersion(config.downloadlocation)
   }
 
@@ -16,7 +17,7 @@ export async function download(config: Config): Promise<void> {
   const pleaseArchive = await tc.downloadTool(downloadUrl)
   const pleaseExtractedFolder = await tc.extractZip(
     pleaseArchive,
-    `${os.homedir()}/.please/${version}`
+    path.join(config.location, version)
   )
 
   const cachedPath = await tc.cacheDir(pleaseExtractedFolder, 'please', version)
@@ -25,7 +26,8 @@ export async function download(config: Config): Promise<void> {
 
 async function findLatestVersion(downloadLocation: string): Promise<string> {
   // TODO: find latest version
-  return ''
+  downloadLocation = ''
+  return downloadLocation
 }
 
 function platform(): string {

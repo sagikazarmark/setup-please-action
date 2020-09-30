@@ -6,7 +6,7 @@ export type Config = Record<string, string>
 
 const defaultConfig: Config = {
   version: 'latest',
-  location: process.env['HOME'] + '/.please',
+  location: path.join(process.env['HOME'] as string, '.please'),
   downloadlocation: 'https://get.please.build'
 }
 
@@ -32,7 +32,7 @@ async function readConfigFiles(profile: string): Promise<string[]> {
   return readFiles(configFiles)
 }
 
-const keyValueRe = /^\s*([A-Za-z0-9\-_]+)\s*=\s*(?:'|")?([A-Za-z0-9\-\._\/]+)(?:'|")?\s*$/
+const keyValueRe = /^\s*([A-Za-z0-9\-_]+)\s*=\s*(?:'|")?([A-Za-z0-9\-._/]+)(?:'|")?\s*$/
 
 // Parse the contents of a git-config/INI-like file.
 // It parses the "please" section of the file and returns a config object.
@@ -41,7 +41,7 @@ export function parseConfig(contents: string): Config {
 
   const lines: string[] = contents.split(/[\r\n]+/)
 
-  let isPleaseSection: boolean = false
+  let isPleaseSection = false
 
   for (const line of lines) {
     // Look for the please section
@@ -61,7 +61,7 @@ export function parseConfig(contents: string): Config {
       break
     }
 
-    let match = line.trim().match(keyValueRe)
+    const match = line.trim().match(keyValueRe)
     if (match) {
       config[match[1].toLowerCase()] = match[2]
     }
