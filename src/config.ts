@@ -1,5 +1,4 @@
-import * as core from '@actions/core'
-import {promises as fs} from 'fs'
+import path from 'path'
 import os from 'os'
 import {readFiles} from './fs-helper'
 
@@ -19,11 +18,15 @@ export async function loadConfig(profile: string): Promise<Config> {
 
 async function readConfigFiles(profile: string): Promise<string[]> {
   const platform = os.platform().toString()
+  const workspace = process.env['GITHUB_WORKSPACE'] as string
 
-  const configFiles = ['.plzconfig', `.plzconfig.${platform}`]
+  const configFiles = [
+    path.join(workspace, '.plzconfig'),
+    path.join(workspace, `.plzconfig.${platform}`)
+  ]
 
   if (profile) {
-    configFiles.push(`.plzconfig.${profile}`)
+    configFiles.push(path.join(workspace, `.plzconfig.${profile}`))
   }
 
   return readFiles(configFiles)
