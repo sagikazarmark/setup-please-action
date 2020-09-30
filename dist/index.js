@@ -2347,7 +2347,7 @@ function run() {
             // Set Please arguments
             core.exportVariable('PLZ_ARGS', '-p');
             // Download Please
-            download_1.download(config);
+            yield download_1.download(config);
         }
         catch (error) {
             core.setFailed(error.message);

@@ -42,7 +42,7 @@ async function run(): Promise<void> {
     core.exportVariable('PLZ_ARGS', '-p')
 
     // Download Please
-    download(config)
+    await download(config)
   } catch (error) {
     core.setFailed(error.message)
   }
