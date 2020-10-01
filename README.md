@@ -1,4 +1,4 @@
-# Set up Please action
+# Setup Please action
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/sagikazarmark/setup-please-action/build-test?style=flat-square)](https://github.com/sagikazarmark/setup-please-action/actions?query=workflow%3Abuild-test)
 
