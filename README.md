@@ -1,8 +1,8 @@
-# Setup Please action
+# Set up Please action
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/sagikazarmark/setup-please-action/build-test?style=flat-square)](https://github.com/sagikazarmark/setup-please-action/actions?query=workflow%3Abuild-test)
 
-**GitHub action to setup [Please](https://please.build/) for building projects.**
+**GitHub action to set up [Please](https://please.build/) for building projects.**
 
 ## Features
 
@@ -31,6 +31,11 @@ Ultimately, the action provides better integration with GitHub Actions and can s
 
 
 ## Usage
+
+```yaml
+      - name: Set up Please
+        uses: sagikazarmark/setup-please-action@v0
+```
 
 ### Inputs
 
