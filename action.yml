@@ -1,5 +1,5 @@
-name: 'Setup Please action'
-description: 'Setup Please with the required environment settings'
+name: 'Set up Please'
+description: 'Set up Please in GitHub Actions'
 author: 'sagikazarmark'
 inputs:
   version:
