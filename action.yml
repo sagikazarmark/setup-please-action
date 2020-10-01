@@ -11,7 +11,7 @@ inputs:
     default: ''
     required: false
   save-logs:
-    description: 'Save build logs as artifacts'
+    description: 'Save build logs as artifacts at the end of each job'
     default: 'false'
     required: false
 runs:
