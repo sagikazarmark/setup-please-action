@@ -1,6 +1,6 @@
 # Set up Please action
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/sagikazarmark/setup-please-action/CI?style=flat-square)](https://github.com/sagikazarmark/setup-please-action/actions?query=workflow%3ACI)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/sagikazarmark/setup-please-action/build-test?style=flat-square)](https://github.com/sagikazarmark/setup-please-action/actions?query=workflow%3Abuild-test)
 
 **GitHub action to setup [Please](https://please.build/) for building projects.**
 
