@@ -44,8 +44,10 @@ async function run(): Promise<void> {
       core.exportVariable('PLZ_OVERRIDES', overrides.join(','))
     }
 
+    const args: string[] = ['-p']
+
     // Set Please arguments
-    core.exportVariable('PLZ_ARGS', '-p')
+    core.exportVariable('PLZ_ARGS', args.join(' '))
 
     // Download Please
     await download(config)
