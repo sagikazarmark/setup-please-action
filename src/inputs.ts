@@ -5,12 +5,21 @@ export enum PleaseOutput {
   ALL
 }
 
+export enum PleaseVerbosity {
+  ERROR,
+  WARNING,
+  NOTICE,
+  INFO,
+  DEBUG
+}
+
 export interface Inputs {
   version: string
   profile: string
   include: string[]
   exclude: string[]
   output: PleaseOutput
+  verbosity: PleaseVerbosity | undefined
   saveLogs: boolean
 }
 
@@ -19,12 +28,17 @@ export async function getInputs(): Promise<Inputs> {
     .getInput('output')
     .toUpperCase() as keyof typeof PleaseOutput
 
+  const verbosity = core
+    .getInput('verbosity')
+    .toUpperCase() as keyof typeof PleaseVerbosity
+
   return {
     version: core.getInput('version'),
     profile: core.getInput('profile'),
     include: await getInputList('include'),
     exclude: await getInputList('exclude'),
     output: PleaseOutput[output] ?? PleaseOutput.PLAIN,
+    verbosity: PleaseVerbosity[verbosity],
     saveLogs: /true/i.test(core.getInput('save-logs'))
   }
 }

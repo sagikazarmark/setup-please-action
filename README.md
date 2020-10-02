@@ -72,7 +72,8 @@ Following inputs can be used as `step.with` keys
 | `profile`           | String  | [Configuration](https://please.build/config.html) profile name |
 | `include`           | List    | Label of targets to include in automatic detection |
 | `exclude`           | List    | Label of targets to exclude from automatic detection |
-| `output `           | Enum    | The level of details the output should contain (`plain` (default, equivalent to `--plain_output`) or `all` (equivalent to `--show_all_output`)) |
+| `output`            | Enum    | Output mode (`plain` (*default*, equivalent to `--plain_output`) or `all` (equivalent to `--show_all_output`)) |
+| `verbosity`         | Enum    | Verbosity of output (One of `error`, `warning`, `notice`, `info`, `debug`. Falls back to Please default.) |
 | `save-logs`         | Bool    | Save build logs as artifacts at the end of each job |
 
 > <sup>*</sup> Required fields

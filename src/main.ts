@@ -7,7 +7,7 @@ import path from 'path'
 import {Config, loadConfig} from './config'
 import {getWorkspaceDirectory} from './context'
 import {download} from './download'
-import {Inputs, PleaseOutput, getInputs} from './inputs'
+import {Inputs, PleaseOutput, PleaseVerbosity, getInputs} from './inputs'
 import * as stateHelper from './state-helper'
 
 async function run(): Promise<void> {
@@ -62,6 +62,10 @@ async function run(): Promise<void> {
 
         args.push('--plain_output')
         break
+    }
+
+    if (inputs.verbosity) {
+      args.push('--verbosity', PleaseVerbosity[inputs.verbosity].toLowerCase())
     }
 
     for (const label of inputs.include) {
