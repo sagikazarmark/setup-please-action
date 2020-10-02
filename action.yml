@@ -19,7 +19,7 @@ inputs:
     default: ''
     required: false
   output:
-    description: 'The level of details the output should contain.'
+    description: 'The level of details the output should contain'
     default: 'plain'
     required: false
   save-logs:
