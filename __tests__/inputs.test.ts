@@ -1,4 +1,4 @@
-import {Inputs, getInputs, getInputList} from '../src/inputs'
+import {Inputs, PleaseOutput, getInputs, getInputList} from '../src/inputs'
 
 describe('getInputs', () => {
   it('returns inputs with defaults', async () => {
@@ -9,15 +9,36 @@ describe('getInputs', () => {
       profile: '',
       include: [],
       exclude: [],
+      output: PleaseOutput.PLAIN,
       saveLogs: false
     })
   })
+
+  it('falls back to PLAIN output', async () => {
+    setInput('output', 'gimme everything')
+
+    const inputs: Inputs = await getInputs()
+
+    expect(inputs).toStrictEqual({
+      version: '',
+      profile: '',
+      include: [],
+      exclude: [],
+      output: PleaseOutput.PLAIN,
+      saveLogs: false
+    })
+  })
+
+  // Note: setInput sets inputs globally.
+  // Either make sure tests are ordered properly or
+  // find a way to reset env vars.
 
   it('returns inputs', async () => {
     setInput('version', '15.5.0')
     setInput('profile', 'ci')
     setInput('include', 'kind, docker')
     setInput('exclude', 'containerd')
+    setInput('output', 'all')
     setInput('save-logs', 'true')
 
     const inputs: Inputs = await getInputs()
@@ -27,6 +48,7 @@ describe('getInputs', () => {
       profile: 'ci',
       include: ['kind', 'docker'],
       exclude: ['containerd'],
+      output: PleaseOutput.ALL,
       saveLogs: true
     })
   })
