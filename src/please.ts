@@ -1,5 +1,4 @@
 import * as core from '@actions/core'
-import {Inputs} from './inputs'
 
 export enum Output {
   PLAIN,
@@ -12,6 +11,13 @@ export enum Verbosity {
   NOTICE,
   INFO,
   DEBUG
+}
+
+export interface Inputs {
+  include: string[]
+  exclude: string[]
+  output: Output
+  verbosity: Verbosity | undefined
 }
 
 export function buildArgs(inputs: Inputs): string[] {
