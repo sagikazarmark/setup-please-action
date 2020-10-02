@@ -7,7 +7,7 @@ import path from 'path'
 import {Config, loadConfig} from './config'
 import {getWorkspaceDirectory} from './context'
 import {download} from './download'
-import {Inputs, getInputs} from './inputs'
+import {Inputs, PleaseOutput, getInputs} from './inputs'
 import * as stateHelper from './state-helper'
 
 async function run(): Promise<void> {
@@ -44,7 +44,25 @@ async function run(): Promise<void> {
       core.exportVariable('PLZ_OVERRIDES', overrides.join(','))
     }
 
-    const args: string[] = ['-p']
+    const args: string[] = []
+
+    switch (inputs.output) {
+      case PleaseOutput.PLAIN:
+        args.push('--plain_output')
+        break
+
+      case PleaseOutput.ALL:
+        args.push('--interactive_output')
+        break
+
+      default:
+        core.warning(
+          `Invalid output type ${inputs.output}: falling back to PLAIN`
+        )
+
+        args.push('--plain_output')
+        break
+    }
 
     for (const label of inputs.include) {
       args.push('--include', label)

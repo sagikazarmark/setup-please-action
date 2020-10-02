@@ -18,6 +18,10 @@ inputs:
     description: 'Label of targets to exclude from automatic detection'
     default: ''
     required: false
+  output:
+    description: 'The level of details the output should contain.'
+    default: 'plain'
+    required: false
   save-logs:
     description: 'Save build logs as artifacts at the end of each job'
     default: 'false'

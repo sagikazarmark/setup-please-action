@@ -44,7 +44,9 @@
       "semi": "off",
       "@typescript-eslint/semi": ["error", "never"],
       "@typescript-eslint/type-annotation-spacing": "error",
-      "@typescript-eslint/unbound-method": "error"
+      "@typescript-eslint/unbound-method": "error",
+      "no-shadow": "off", // replaced by ts-eslint rule below: https://github.com/typescript-eslint/typescript-eslint/issues/2471#issuecomment-696609988
+      "@typescript-eslint/no-shadow": "error"
     },
     "env": {
       "node": true,
