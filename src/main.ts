@@ -52,7 +52,7 @@ async function run(): Promise<void> {
         break
 
       case PleaseOutput.ALL:
-        args.push('--interactive_output')
+        args.push('--show_all_output')
         break
 
       default:
