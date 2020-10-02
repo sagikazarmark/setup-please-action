@@ -481,7 +481,7 @@ function run() {
                     args.push('--plain_output');
                     break;
                 case inputs_1.PleaseOutput.ALL:
-                    args.push('--interactive_output');
+                    args.push('--show_all_output');
                     break;
                 default:
                     core.warning(`Invalid output type ${inputs.output}: falling back to PLAIN`);
