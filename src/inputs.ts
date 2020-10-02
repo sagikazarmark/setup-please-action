@@ -3,13 +3,17 @@ import * as core from '@actions/core'
 export interface Inputs {
   version: string
   profile: string
+  include: string[]
+  exclude: string[]
   saveLogs: boolean
 }
 
-export function getInputs(): Inputs {
+export async function getInputs(): Promise<Inputs> {
   return {
     version: core.getInput('version'),
     profile: core.getInput('profile'),
+    include: await getInputList('include'),
+    exclude: await getInputList('exclude'),
     saveLogs: /true/i.test(core.getInput('save-logs'))
   }
 }

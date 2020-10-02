@@ -12,7 +12,7 @@ import * as stateHelper from './state-helper'
 
 async function run(): Promise<void> {
   try {
-    const inputs: Inputs = getInputs()
+    const inputs: Inputs = await getInputs()
 
     const overrides: string[] = []
 
@@ -46,6 +46,14 @@ async function run(): Promise<void> {
 
     const args: string[] = ['-p']
 
+    for (const label of inputs.include) {
+      args.push('--include', label)
+    }
+
+    for (const label of inputs.exclude) {
+      args.push('--exclude', label)
+    }
+
     // Set Please arguments
     core.exportVariable('PLZ_ARGS', args.join(' '))
 
@@ -58,7 +66,7 @@ async function run(): Promise<void> {
 
 async function post(): Promise<void> {
   try {
-    const inputs: Inputs = getInputs()
+    const inputs: Inputs = await getInputs()
 
     if (inputs.saveLogs) {
       const job = jobName()

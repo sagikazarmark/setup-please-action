@@ -2,11 +2,13 @@ import {Inputs, getInputs, getInputList} from '../src/inputs'
 
 describe('getInputs', () => {
   it('returns inputs with defaults', async () => {
-    const inputs: Inputs = getInputs()
+    const inputs: Inputs = await getInputs()
 
     expect(inputs).toStrictEqual({
       version: '',
       profile: '',
+      include: [],
+      exclude: [],
       saveLogs: false
     })
   })
@@ -14,13 +16,17 @@ describe('getInputs', () => {
   it('returns inputs', async () => {
     setInput('version', '15.5.0')
     setInput('profile', 'ci')
+    setInput('include', 'kind, docker')
+    setInput('exclude', 'containerd')
     setInput('save-logs', 'true')
 
-    const inputs: Inputs = getInputs()
+    const inputs: Inputs = await getInputs()
 
     expect(inputs).toStrictEqual({
       version: '15.5.0',
       profile: 'ci',
+      include: ['kind', 'docker'],
+      exclude: ['containerd'],
       saveLogs: true
     })
   })
