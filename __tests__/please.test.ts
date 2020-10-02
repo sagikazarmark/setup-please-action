@@ -1,15 +1,14 @@
-import {Inputs, PleaseOutput, PleaseVerbosity} from '../src/inputs'
-import {buildArgs} from '../src/please'
+import * as please from '../src/please'
 
 describe('buildArgs', () => {
   it('returns args with empty inputs', async () => {
     expect(
-      buildArgs({
+      please.buildArgs({
         version: '',
         profile: '',
         include: [],
         exclude: [],
-        output: PleaseOutput.PLAIN,
+        output: please.Output.PLAIN,
         verbosity: undefined,
         saveLogs: false
       })
@@ -18,13 +17,13 @@ describe('buildArgs', () => {
 
   it('returns args with empty inputs', async () => {
     expect(
-      buildArgs({
+      please.buildArgs({
         version: '',
         profile: '',
         include: ['label1'],
         exclude: ['label2', 'label3'],
-        output: PleaseOutput.ALL,
-        verbosity: PleaseVerbosity.DEBUG,
+        output: please.Output.ALL,
+        verbosity: please.Verbosity.DEBUG,
         saveLogs: false
       })
     ).toStrictEqual([

@@ -1,15 +1,28 @@
 import * as core from '@actions/core'
-import {Inputs, PleaseOutput, PleaseVerbosity} from './inputs'
+import {Inputs} from './inputs'
+
+export enum Output {
+  PLAIN,
+  ALL
+}
+
+export enum Verbosity {
+  ERROR,
+  WARNING,
+  NOTICE,
+  INFO,
+  DEBUG
+}
 
 export function buildArgs(inputs: Inputs): string[] {
   const args: string[] = []
 
   switch (inputs.output) {
-    case PleaseOutput.PLAIN:
+    case Output.PLAIN:
       args.push('--plain_output')
       break
 
-    case PleaseOutput.ALL:
+    case Output.ALL:
       args.push('--show_all_output')
       break
 
@@ -23,7 +36,7 @@ export function buildArgs(inputs: Inputs): string[] {
   }
 
   if (inputs.verbosity) {
-    args.push('--verbosity', PleaseVerbosity[inputs.verbosity].toLowerCase())
+    args.push('--verbosity', Verbosity[inputs.verbosity].toLowerCase())
   }
 
   for (const label of inputs.include) {
