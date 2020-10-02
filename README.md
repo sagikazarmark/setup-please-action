@@ -54,7 +54,7 @@ Then in your build steps:
 > See [thought-machine/please#1174](https://github.com/thought-machine/please/issues/1174) for details.
 
 If (for some reason) you need to use `please` directly or your `pleasew` script that doesn't support [`PLZ_ARGS`](https://github.com/thought-machine/please/pull/1252),
-make sure to pass the `$PLZ_ARGS` environment variable to it to use all the features of this action:
+make sure to pass the `$PLZ_ARGS` environment variable to the command to utilize all features of this action:
 
 ```yaml
 - name: Build
