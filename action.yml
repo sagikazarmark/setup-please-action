@@ -10,6 +10,14 @@ inputs:
     description: 'Configuration profile name'
     default: ''
     required: false
+  include:
+    description: 'Label of targets to include in automatic detection'
+    default: ''
+    required: false
+  exclude:
+    description: 'Label of targets to exclude from automatic detection'
+    default: ''
+    required: false
   save-logs:
     description: 'Save build logs as artifacts at the end of each job'
     default: 'false'
