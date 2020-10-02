@@ -357,15 +357,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getInputList = exports.getInputs = void 0;
+exports.getInputList = exports.getInputs = exports.PleaseOutput = void 0;
 const core = __importStar(__webpack_require__(2186));
+var PleaseOutput;
+(function (PleaseOutput) {
+    PleaseOutput[PleaseOutput["PLAIN"] = 0] = "PLAIN";
+    PleaseOutput[PleaseOutput["ALL"] = 1] = "ALL";
+})(PleaseOutput = exports.PleaseOutput || (exports.PleaseOutput = {}));
 function getInputs() {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
+        const output = core
+            .getInput('output')
+            .toUpperCase();
         return {
             version: core.getInput('version'),
             profile: core.getInput('profile'),
             include: yield getInputList('include'),
             exclude: yield getInputList('exclude'),
+            output: (_a = PleaseOutput[output]) !== null && _a !== void 0 ? _a : PleaseOutput.PLAIN,
             saveLogs: /true/i.test(core.getInput('save-logs'))
         };
     });
@@ -465,7 +475,19 @@ function run() {
             if (overrides.length > 0) {
                 core.exportVariable('PLZ_OVERRIDES', overrides.join(','));
             }
-            const args = ['-p'];
+            const args = [];
+            switch (inputs.output) {
+                case inputs_1.PleaseOutput.PLAIN:
+                    args.push('--plain_output');
+                    break;
+                case inputs_1.PleaseOutput.ALL:
+                    args.push('--interactive_output');
+                    break;
+                default:
+                    core.warning(`Invalid output type ${inputs.output}: falling back to PLAIN`);
+                    args.push('--plain_output');
+                    break;
+            }
             for (const label of inputs.include) {
                 args.push('--include', label);
             }
