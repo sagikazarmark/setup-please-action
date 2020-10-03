@@ -7,7 +7,8 @@ import path from 'path'
 import {Config, loadConfig} from './config'
 import {getWorkspaceDirectory} from './context'
 import {download} from './download'
-import {Inputs, PleaseOutput, getInputs} from './inputs'
+import {Inputs, getInputs} from './inputs'
+import {buildArgs} from './please'
 import * as stateHelper from './state-helper'
 
 async function run(): Promise<void> {
@@ -44,36 +45,8 @@ async function run(): Promise<void> {
       core.exportVariable('PLZ_OVERRIDES', overrides.join(','))
     }
 
-    const args: string[] = []
-
-    switch (inputs.output) {
-      case PleaseOutput.PLAIN:
-        args.push('--plain_output')
-        break
-
-      case PleaseOutput.ALL:
-        args.push('--show_all_output')
-        break
-
-      default:
-        core.warning(
-          `Invalid output type ${inputs.output}: falling back to PLAIN`
-        )
-
-        args.push('--plain_output')
-        break
-    }
-
-    for (const label of inputs.include) {
-      args.push('--include', label)
-    }
-
-    for (const label of inputs.exclude) {
-      args.push('--exclude', label)
-    }
-
     // Set Please arguments
-    core.exportVariable('PLZ_ARGS', args.join(' '))
+    core.exportVariable('PLZ_ARGS', buildArgs(inputs).join(' '))
 
     // Download Please
     await download(config)

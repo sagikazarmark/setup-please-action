@@ -19,8 +19,12 @@ inputs:
     default: ''
     required: false
   output:
-    description: 'The level of details the output should contain'
+    description: 'Output mode'
     default: 'plain'
+    required: false
+  verbosity:
+    description: 'Verbosity of output'
+    default: ''
     required: false
   save-logs:
     description: 'Save build logs as artifacts at the end of each job'

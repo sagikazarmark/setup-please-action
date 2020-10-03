@@ -1,4 +1,5 @@
-import {Inputs, PleaseOutput, getInputs, getInputList} from '../src/inputs'
+import {Inputs, getInputs, getInputList} from '../src/inputs'
+import * as please from '../src/please'
 
 describe('getInputs', () => {
   it('returns inputs with defaults', async () => {
@@ -9,7 +10,8 @@ describe('getInputs', () => {
       profile: '',
       include: [],
       exclude: [],
-      output: PleaseOutput.PLAIN,
+      output: please.Output.PLAIN,
+      verbosity: undefined,
       saveLogs: false
     })
   })
@@ -24,7 +26,8 @@ describe('getInputs', () => {
       profile: '',
       include: [],
       exclude: [],
-      output: PleaseOutput.PLAIN,
+      output: please.Output.PLAIN,
+      verbosity: undefined,
       saveLogs: false
     })
   })
@@ -39,6 +42,7 @@ describe('getInputs', () => {
     setInput('include', 'kind, docker')
     setInput('exclude', 'containerd')
     setInput('output', 'all')
+    setInput('verbosity', 'debug')
     setInput('save-logs', 'true')
 
     const inputs: Inputs = await getInputs()
@@ -48,7 +52,8 @@ describe('getInputs', () => {
       profile: 'ci',
       include: ['kind', 'docker'],
       exclude: ['containerd'],
-      output: PleaseOutput.ALL,
+      output: please.Output.ALL,
+      verbosity: please.Verbosity.DEBUG,
       saveLogs: true
     })
   })

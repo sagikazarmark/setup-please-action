@@ -357,25 +357,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getInputList = exports.getInputs = exports.PleaseOutput = void 0;
+exports.getInputList = exports.getInputs = void 0;
 const core = __importStar(__webpack_require__(2186));
-var PleaseOutput;
-(function (PleaseOutput) {
-    PleaseOutput[PleaseOutput["PLAIN"] = 0] = "PLAIN";
-    PleaseOutput[PleaseOutput["ALL"] = 1] = "ALL";
-})(PleaseOutput = exports.PleaseOutput || (exports.PleaseOutput = {}));
+const please = __importStar(__webpack_require__(7122));
 function getInputs() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const output = core
             .getInput('output')
             .toUpperCase();
+        const verbosity = core
+            .getInput('verbosity')
+            .toUpperCase();
         return {
             version: core.getInput('version'),
             profile: core.getInput('profile'),
             include: yield getInputList('include'),
             exclude: yield getInputList('exclude'),
-            output: (_a = PleaseOutput[output]) !== null && _a !== void 0 ? _a : PleaseOutput.PLAIN,
+            output: (_a = please.Output[output]) !== null && _a !== void 0 ? _a : please.Output.PLAIN,
+            verbosity: please.Verbosity[verbosity],
             saveLogs: /true/i.test(core.getInput('save-logs'))
         };
     });
@@ -448,6 +448,7 @@ const config_1 = __webpack_require__(88);
 const context_1 = __webpack_require__(3842);
 const download_1 = __webpack_require__(5933);
 const inputs_1 = __webpack_require__(6180);
+const please_1 = __webpack_require__(7122);
 const stateHelper = __importStar(__webpack_require__(8647));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -475,27 +476,8 @@ function run() {
             if (overrides.length > 0) {
                 core.exportVariable('PLZ_OVERRIDES', overrides.join(','));
             }
-            const args = [];
-            switch (inputs.output) {
-                case inputs_1.PleaseOutput.PLAIN:
-                    args.push('--plain_output');
-                    break;
-                case inputs_1.PleaseOutput.ALL:
-                    args.push('--show_all_output');
-                    break;
-                default:
-                    core.warning(`Invalid output type ${inputs.output}: falling back to PLAIN`);
-                    args.push('--plain_output');
-                    break;
-            }
-            for (const label of inputs.include) {
-                args.push('--include', label);
-            }
-            for (const label of inputs.exclude) {
-                args.push('--exclude', label);
-            }
             // Set Please arguments
-            core.exportVariable('PLZ_ARGS', args.join(' '));
+            core.exportVariable('PLZ_ARGS', please_1.buildArgs(inputs).join(' '));
             // Download Please
             yield download_1.download(config);
         }
@@ -554,6 +536,76 @@ if (!stateHelper.IsPost) {
 else {
     post();
 }
+
+
+/***/ }),
+
+/***/ 7122:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.buildArgs = exports.Verbosity = exports.Output = void 0;
+const core = __importStar(__webpack_require__(2186));
+var Output;
+(function (Output) {
+    Output[Output["PLAIN"] = 0] = "PLAIN";
+    Output[Output["ALL"] = 1] = "ALL";
+})(Output = exports.Output || (exports.Output = {}));
+var Verbosity;
+(function (Verbosity) {
+    Verbosity[Verbosity["ERROR"] = 0] = "ERROR";
+    Verbosity[Verbosity["WARNING"] = 1] = "WARNING";
+    Verbosity[Verbosity["NOTICE"] = 2] = "NOTICE";
+    Verbosity[Verbosity["INFO"] = 3] = "INFO";
+    Verbosity[Verbosity["DEBUG"] = 4] = "DEBUG";
+})(Verbosity = exports.Verbosity || (exports.Verbosity = {}));
+function buildArgs(inputs) {
+    const args = [];
+    switch (inputs.output) {
+        case Output.PLAIN:
+            args.push('--plain_output');
+            break;
+        case Output.ALL:
+            args.push('--show_all_output');
+            break;
+        default:
+            core.warning(`Invalid output type ${inputs.output}: falling back to PLAIN`);
+            args.push('--plain_output');
+            break;
+    }
+    if (inputs.verbosity) {
+        args.push('--verbosity', Verbosity[inputs.verbosity].toLowerCase());
+    }
+    for (const label of inputs.include) {
+        args.push('--include', label);
+    }
+    for (const label of inputs.exclude) {
+        args.push('--exclude', label);
+    }
+    return args;
+}
+exports.buildArgs = buildArgs;
 
 
 /***/ }),
