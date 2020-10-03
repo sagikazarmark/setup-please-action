@@ -79,12 +79,44 @@ Following inputs can be used as `step.with` keys
 > <sup>*</sup> Required fields
 
 
-### Save logs
+### Debugging build process
 
-By default, Please runs with `-p` (plain output) when using this action.
-In order to debug potential build failures, you need to examine the logs in `plz-out/log`.
+Please produces a large amount of logs that can help debugging builds.
+There are two approaches for accessing those logs using this action.
+Both have their advantages and disadvantages. You might not need them at all (they are turned off by default).
+Choose the one that makes the most sense for you or enable them on demand when you need them.
 
-Without using this action, logs can easily be saved as artifacts with a few lines of YAML:
+
+#### Output logs to stderr
+
+This action provides two inputs to control what Please outputs to the stderr:
+
+- `output`
+- `verbosity`
+
+(Check the table above for details)
+
+The following example makes Please output everything it has to the stderr:
+
+```yaml
+- name: Set up Please
+  uses: sagikazarmark/setup-please-action@v0
+  with:
+    output: all
+    verbosity: debug
+```
+
+By dumping everything to the stderr, you can easily browse, search or even download logs from the GitHub Actions UI.
+
+Most of the time you probably don't need this level of verbosity though,
+and it makes finding failed targets and the reason they failed harder.
+
+
+#### Save logs as artifacts
+
+Another option for examining Please logs is saving them as artifacts.
+
+You can easily do that with a few lines of YAML:
 
 ```yaml
 - name: Save Please log output
@@ -94,10 +126,8 @@ Without using this action, logs can easily be saved as artifacts with a few line
     path: plz-out/log
 ```
 
-When using this action, you can simply enable `save-logs` and forget about it.
+This action can save you those lines by simply enabling the `save-logs` option:
 
-**Note: for the time being enabling `save-logs` is not enough, you also need to pass the `matrix` as an environment variable if you utilize the [build matrix](https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix) feature.**
-**See [#6](https://github.com/sagikazarmark/setup-please-action/issues/6) for more details.**
 
 ```yaml
 - name: Set up Please
@@ -108,6 +138,11 @@ When using this action, you can simply enable `save-logs` and forget about it.
     # See https://github.com/sagikazarmark/setup-please-action/issues/6
     MATRIX_CONTEXT: ${{ toJson(matrix) }}
 ```
+
+**Note: for the time being enabling `save-logs` is not enough, you also need to pass the `matrix` as an environment variable if you utilize the [build matrix](https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix) feature.**
+**See [#6](https://github.com/sagikazarmark/setup-please-action/issues/6) for more details.**
+
+The logs will be available for each job in your workflow as a separate build artifact called `JOBNAME-log`.
 
 
 ## License
