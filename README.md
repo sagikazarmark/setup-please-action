@@ -133,7 +133,7 @@ This action can save you those lines by simply enabling the `save-logs` option:
 - name: Set up Please
   uses: sagikazarmark/setup-please-action@v0
   with:
-    save-logs: 'true'
+    save-logs: true
   env:
     # See https://github.com/sagikazarmark/setup-please-action/issues/6
     MATRIX_CONTEXT: ${{ toJson(matrix) }}
