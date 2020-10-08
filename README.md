@@ -78,6 +78,16 @@ Following inputs can be used as `step.with` keys
 
 > <sup>*</sup> Required fields
 
+> `List` type can be a comma or newline-delimited string
+> ```yaml
+> include: kind, minikube
+> ```
+> ```yaml
+> tags: |
+>   kind
+>   minikube
+> ```
+
 
 ### Debugging build process
 
