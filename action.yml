@@ -1,6 +1,10 @@
 name: 'Set up Please'
 description: 'Set up Please in GitHub Actions'
 author: 'sagikazarmark'
+branding:
+  icon: 'target'
+  color: 'purple'
+
 inputs:
   version:
     description: 'Please version. Overrides the version in .plzconfig.'
@@ -25,10 +29,8 @@ inputs:
     description: 'Save build logs as artifacts at the end of each job'
     default: 'false'
     required: false
+
 runs:
   using: 'node12'
   main: 'dist/index.js'
   post: 'dist/index.js'
-branding:
-  icon: 'target'
-  color: 'purple'
