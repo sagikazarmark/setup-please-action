@@ -17,7 +17,7 @@ async function downloadPlease(config: Config): Promise<void> {
   if (version === 'latest') {
     core.info('Finding latest version')
 
-    version = await findLatestVersion(config.downloadlocation)
+    version = (await findLatestVersion(config.downloadlocation)).trim()
 
     core.info(`Latest version is '${version}'`)
   }
