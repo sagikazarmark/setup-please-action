@@ -192,7 +192,7 @@ function downloadPlease(config) {
         let version = config.version;
         if (version === 'latest') {
             core.info('Finding latest version');
-            version = yield findLatestVersion(config.downloadlocation);
+            version = (yield findLatestVersion(config.downloadlocation)).trim();
             core.info(`Latest version is '${version}'`);
         }
         let toolPath;
